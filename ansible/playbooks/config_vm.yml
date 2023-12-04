@@ -1,0 +1,71 @@
+---
+- name: Run MySQL Docker Container
+  hosts: all
+  become: true
+  vars:
+    mysql_root_password: root
+    mysql_container_name: mysql-container
+    mysql_database: my_db
+    mysql_user: user
+    mysql_password: pass
+    pkg: ["docker.io", "net-tools", "python3-pip"]
+  tasks:
+
+    -  name: update apt 
+       apt: 
+          update_cache: yes     
+
+    -  name: installation packages
+       apt:
+        name: 
+          "{{pkg}}"  
+        state: present
+
+    -  name: ajout user au group docker
+       user:
+        name: "{{ansible_ssh_user}}"
+        groups: docker
+        append: yes    
+
+    - name: Install Python Docker module
+      pip:
+        name: docker
+      become: true 
+           
+    - name: Pull MySQL Docker Image
+      docker_image:
+        name: mysql:latest
+        source: pull
+        state: present
+      become: true
+    
+    - name: Run MySQL Docker Container
+      docker_container:
+        name: "{{ mysql_container_name }}"
+        image: mysql:latest
+        env:
+          MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+          MYSQL_DATABASE: "{{ mysql_database }}"
+          MYSQL_USER: "{{ mysql_user }}"
+          MYSQL_PASSWORD: "{{ mysql_password }}"
+        ports:
+          - "3306:3306"
+        detach: yes
+        container_default_behavior: compatibility
+      become: true
+
+    - name: Wait for MySQL to start
+      wait_for:
+        host: 127.0.0.1
+        port: 3306
+        state: started
+
+    - name: Display Existing Databases
+      command: "docker exec {{ mysql_container_name }} mysql -u{{ mysql_user }} -p{{ mysql_password }} -e 'SHOW DATABASES;'"
+      register: show_tables_output
+
+    - name: Print Existing Databases
+      debug:
+        var: show_tables_output
+
+
