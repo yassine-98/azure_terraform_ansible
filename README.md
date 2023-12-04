@@ -7,6 +7,15 @@ The goal of this project is to provision a virtual machine in Azure using Terraf
 ## 1. Prerequisites:
 
 - Ensure Terraform is installed on your local machine.
+# Terraform_Ansible_Azure
+
+## Project Overview:
+
+The goal of this project is to provision a virtual machine in Azure using Terraform and configure this virtual machine with Ansible. The aim is to install and run Docker inside the provisioned virtual machine.
+
+## 1. Prerequisites:
+
+- Ensure Terraform is installed on your local machine.
 - Make sure to have an Azure subscription and the necessary credentials.
 - Install Ansible on your local machine.
 
@@ -51,7 +60,7 @@ The goal of this project is to provision a virtual machine in Azure using Terraf
 
 - Execute Ansible playbook to configure the virtual machine and install Docker:
   ```bash
-  ansible-playbook configure_vm.yml
+  ansible-playbook playbooks/config_vm.yml
   ```
 
 Feel free to customize the project structure or add more details as needed.
